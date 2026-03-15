@@ -1,0 +1,39 @@
+name: "Devin Security Fixes"
+
+on:
+    workflow_run:
+        workflows: ["CodeQL"]
+        types:
+            - completed
+
+jobs:
+    devin-security-fixes:
+        runs-on: ubuntu-latest
+
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Download CodeQL Output
+            uses: actions/download-artifact@v4
+            with:
+              name: github-codeql-sarif
+              run-id: ${{ github.event.workflow_run.id }}
+
+          - name: Setup Python
+            uses: actions/setup-python@v4
+            with:
+              python-version: "3.10"
+
+          - name: Install dependencies
+            run: |
+                python -m pip install --upgrade pip
+                pip install requests
+          - name: Run Devin Issuer
+            env:
+              DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}
+              GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+            run: |
+              python .github/scripts/devin_issuer.py
