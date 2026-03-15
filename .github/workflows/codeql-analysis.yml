@@ -34,3 +34,10 @@ jobs:
       uses: github/codeql-action/autobuild@v3
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
+    - name: Save SARIF as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: github-codeql-sarif
+        # This path is the standard location where CodeQL stores its results
+        path: ${{ runner.temp }}/results/*.sarif
+        retention-days: 1
