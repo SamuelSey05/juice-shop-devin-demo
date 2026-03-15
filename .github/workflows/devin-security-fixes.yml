@@ -21,7 +21,7 @@ jobs:
             env: 
                 GH_TOKEN: ${{ secrets.GH_TOKEN }}
             run: |
-                RUN_ID=$(gh run list --workflow "CodeQL" --status success --limit 1 --json databaseId --jq '.[0].databaseId')
+                RUN_ID=$(gh run list --workflow "CodeQL Scan" --status success --limit 1 --json databaseId --jq '.[0].databaseId')
 
                 echo "Run ID: $RUN_ID"
 
