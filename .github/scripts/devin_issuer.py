@@ -14,7 +14,8 @@ def main():
     results = data["runs"][0]["results"]
     high_priority = [r for r in results if r.get("level") in ["error", "warning"]]
 
-    for error in high_priority[0:1]:
+    for error in high_priority[0:2]:
+        print(error)
         rule_id = error["ruleId"]
         message = error["message"]["text"]
         
