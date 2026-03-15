@@ -11,8 +11,6 @@ def main():
     with open(sarif_path, "r") as f:
         data = json.load(f)
 
-    print(data)
-
     results = data["runs"][0]["results"]
     high_priority = [r for r in results if r.get("level") in ["error", "warning"]]
 
