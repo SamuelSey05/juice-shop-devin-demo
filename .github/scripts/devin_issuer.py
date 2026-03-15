@@ -3,8 +3,12 @@ import os
 import requests
 
 def main():
+    sarif_path = "results.sarif"
+    if not os.path.exists(sarif_path):
+        sarif_path = "github-codeql-sarif"
+    
     # Load the JSON file containing the issuer information
-    with open("results/sarif", "r") as f:
+    with open(sarif_path, "r") as f:
         data = json.load(f)
 
     results = data["runs"][0]["results"]
