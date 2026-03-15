@@ -38,6 +38,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: github-codeql-sarif
-        # This path is the standard location where CodeQL stores its results
-        path: ${{ runner.temp }}/results/*.sarif
+        # This looks for any .sarif file in the entire workspace
+        path: "**/*.sarif" 
+        if-no-files-found: error
         retention-days: 1
