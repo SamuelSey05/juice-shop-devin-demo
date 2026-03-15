@@ -10,6 +10,14 @@ on:
 jobs:
     devin-security-fixes:
         runs-on: ubuntu-latest
+        permissions:
+            actions: read
+            contents: read
+            security-events: write
+        strategy:
+            fail-fast: false
+            matrix:
+                language: [ 'javascript-typescript' ]
 
         if: github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
 
@@ -17,23 +25,36 @@ jobs:
           - name: Checkout code
             uses: actions/checkout@v4
 
-          - name: Download CodeQL Output
-            env: 
-                GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          - name: Initialize CodeQL
+            uses: github/codeql-action/init@v3
+            with:
+                languages: ${{ matrix.language }}
+                queries: security-extended
+                config: |
+                    paths-ignore:
+                        - 'data/static/codefixes'
+                    query-filters:
+                    - exclude:
+                        id: js/missing-rate-limiting
+          - name: Autobuild
+            uses: github/codeql-action/autobuild@v3
+          - name: Perform CodeQL Analysis
+            uses: github/codeql-action/analyze@v3
+            with:
+                category: "/language:javascript"
+                # This forces CodeQL to output the SARIF file to a known location
+                output: sarif-results
+
+          - name: Locate SARIF
             run: |
-                RUN_ID=$(gh run list --workflow "CodeQL Scan" --status success --limit 1 --json databaseId --jq '.[0].databaseId')
-
-                echo "Run ID: $RUN_ID"
-
-                gh run download $RUN_ID --name github-codeql-sarif --dir ./
-
-                ls -R
+                echo "Looking for SARIF..."
+                find sarif-results -name "*.sarif" -exec cp {} ./results.sarif \;
+                ls -l results.sarif
 
           - name: Setup Python
             uses: actions/setup-python@v4
             with:
               python-version: "3.10"
-
           - name: Install dependencies
             run: |
                 python -m pip install --upgrade pip

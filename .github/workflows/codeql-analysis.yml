@@ -34,11 +34,3 @@ jobs:
       uses: github/codeql-action/autobuild@v3
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
-    - name: Save SARIF as Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: github-codeql-sarif
-        # This looks for any .sarif file in the entire workspace
-        path: "**/*.sarif" 
-        if-no-files-found: error
-        retention-days: 1
