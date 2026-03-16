@@ -28,6 +28,7 @@ describe('antiCheat', () => {
     it('should not log sensitive challenge keys in clear text', () => {
       for (const sensitiveKey of SENSITIVE_CHALLENGE_KEYS) {
         const challenge = {
+          id: 42,
           key: sensitiveKey,
           name: 'Test Challenge',
           category: 'test',
@@ -47,8 +48,9 @@ describe('antiCheat', () => {
       }
     })
 
-    it('should still log non-sensitive challenge keys normally', () => {
+    it('should log challenge numeric ID instead of key', () => {
       const challenge = {
+        id: 7,
         key: 'scoreBoardChallenge',
         name: 'Score Board',
         category: 'test',
@@ -63,11 +65,13 @@ describe('antiCheat', () => {
       const logCall = loggerInfoStub.lastCall
       const logMessage = logCall.args[0] as string
 
-      expect(logMessage).to.include('scoreBoardChallenge')
+      expect(logMessage).to.include('challenge #')
+      expect(logMessage).to.include('7')
     })
 
-    it('should use [REDACTED] placeholder for sensitive challenge keys', () => {
+    it('should never log any challenge key for sensitive challenges', () => {
       const challenge = {
+        id: 99,
         key: 'weakPasswordChallenge',
         name: 'Weak Password',
         category: 'test',
@@ -82,7 +86,9 @@ describe('antiCheat', () => {
       const logCall = loggerInfoStub.lastCall
       const logMessage = logCall.args[0] as string
 
-      expect(logMessage).to.include('[REDACTED]')
+      expect(logMessage).to.include('challenge #')
+      expect(logMessage).to.include('99')
+      expect(logMessage).to.not.include('weakPasswordChallenge')
     })
   })
 })
