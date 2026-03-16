@@ -4,39 +4,39 @@
  */
 
 import chai from 'chai'
-import { sanitizeKeyForLog } from '../../lib/antiCheat'
+import { isSensitiveChallenge } from '../../lib/antiCheat'
 
 const expect = chai.expect
 
 describe('antiCheat', () => {
-  describe('sanitizeKeyForLog', () => {
-    it('should mask sensitive password-related challenge keys', () => {
-      expect(sanitizeKeyForLog('changePasswordBenderChallenge')).to.equal('cha***')
-      expect(sanitizeKeyForLog('weakPasswordChallenge')).to.equal('wea***')
-      expect(sanitizeKeyForLog('dlpPasswordSprayingChallenge')).to.equal('dlp***')
-      expect(sanitizeKeyForLog('oauthUserPasswordChallenge')).to.equal('oau***')
-      expect(sanitizeKeyForLog('resetPasswordJimChallenge')).to.equal('res***')
-      expect(sanitizeKeyForLog('resetPasswordBenderChallenge')).to.equal('res***')
-      expect(sanitizeKeyForLog('resetPasswordBjoernChallenge')).to.equal('res***')
-      expect(sanitizeKeyForLog('resetPasswordMortyChallenge')).to.equal('res***')
-      expect(sanitizeKeyForLog('resetPasswordBjoernOwaspChallenge')).to.equal('res***')
-      expect(sanitizeKeyForLog('resetPasswordUvoginChallenge')).to.equal('res***')
-      expect(sanitizeKeyForLog('passwordRepeatChallenge')).to.equal('pas***')
+  describe('isSensitiveChallenge', () => {
+    it('should identify password-related challenge keys as sensitive', () => {
+      expect(isSensitiveChallenge('changePasswordBenderChallenge')).to.equal(true)
+      expect(isSensitiveChallenge('weakPasswordChallenge')).to.equal(true)
+      expect(isSensitiveChallenge('dlpPasswordSprayingChallenge')).to.equal(true)
+      expect(isSensitiveChallenge('oauthUserPasswordChallenge')).to.equal(true)
+      expect(isSensitiveChallenge('resetPasswordJimChallenge')).to.equal(true)
+      expect(isSensitiveChallenge('resetPasswordBenderChallenge')).to.equal(true)
+      expect(isSensitiveChallenge('resetPasswordBjoernChallenge')).to.equal(true)
+      expect(isSensitiveChallenge('resetPasswordMortyChallenge')).to.equal(true)
+      expect(isSensitiveChallenge('resetPasswordBjoernOwaspChallenge')).to.equal(true)
+      expect(isSensitiveChallenge('resetPasswordUvoginChallenge')).to.equal(true)
+      expect(isSensitiveChallenge('passwordRepeatChallenge')).to.equal(true)
     })
 
-    it('should mask sensitive API key challenge keys', () => {
-      expect(sanitizeKeyForLog('leakedApiKeyChallenge')).to.equal('lea***')
+    it('should identify API key challenge keys as sensitive', () => {
+      expect(isSensitiveChallenge('leakedApiKeyChallenge')).to.equal(true)
     })
 
-    it('should not mask non-sensitive challenge keys', () => {
-      expect(sanitizeKeyForLog('scoreBoardChallenge')).to.equal('scoreBoardChallenge')
-      expect(sanitizeKeyForLog('loginAdminChallenge')).to.equal('loginAdminChallenge')
-      expect(sanitizeKeyForLog('errorHandlingChallenge')).to.equal('errorHandlingChallenge')
-      expect(sanitizeKeyForLog('directoryListingChallenge')).to.equal('directoryListingChallenge')
+    it('should not identify non-sensitive challenge keys as sensitive', () => {
+      expect(isSensitiveChallenge('scoreBoardChallenge')).to.equal(false)
+      expect(isSensitiveChallenge('loginAdminChallenge')).to.equal(false)
+      expect(isSensitiveChallenge('errorHandlingChallenge')).to.equal(false)
+      expect(isSensitiveChallenge('directoryListingChallenge')).to.equal(false)
     })
 
-    it('should return the original key for unknown keys', () => {
-      expect(sanitizeKeyForLog('someUnknownChallenge')).to.equal('someUnknownChallenge')
+    it('should return false for unknown keys', () => {
+      expect(isSensitiveChallenge('someUnknownChallenge')).to.equal(false)
     })
   })
 })
