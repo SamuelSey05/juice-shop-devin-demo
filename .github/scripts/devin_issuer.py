@@ -12,11 +12,10 @@ def main():
         data = json.load(f)
 
     results = data["runs"][0]["results"]
-    high_priority = [r for r in results if r["problem.severity"] == "error"]
 
-    print(len(high_priority), "high priority issues found. Processing the top 2...")
+    print(f"Total issues found: {len(results)}")
 
-    for error in high_priority[0:2]:
+    for error in results[0:2]:
         print(error)
         rule_id = error["ruleId"]
         message = error["message"]["text"]
