@@ -37,9 +37,13 @@ def main():
 
         payload = {"prompt": prompt, "idempotency_key": f"{rule_id}_{location}_{line}"}
 
-        response = requests.post("https://api.devin.ai/v3/organisations/org-7aaaba4d64474a1a931e3aa3323b5ce8/sessions", headers=headers, json=payload)    
+        # url = "https://api.devin.ai/v3/organisations/org-7aaaba4d64474a1a931e3aa3323b5ce8/sessions"
 
-        if response.status_code == 200:
+        url = "https://api.devin.ai/v1/sessions"
+
+        response = requests.post(url, headers=headers, json=payload)    
+
+        if response.status_code in [200, 201]:
             print(f"Successfully created session for {rule_id} at {location}:{line}")
         else:            
             print(f"Failed to create session for {rule_id} at {location}:{line}. Status code: {response.status_code}, Response: {response.text}")    
