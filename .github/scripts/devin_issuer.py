@@ -23,7 +23,6 @@ def main():
     print(f"Total issues found: {len(results)}")
 
     for error in results[0:2]:
-        print(error)
         rule_id = error["ruleId"]
         message = error["message"]["text"]
         

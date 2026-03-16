@@ -61,7 +61,7 @@ jobs:
                 pip install requests
           - name: Run Devin Issuer
             env:
-              DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}
+              DEVIN_API_KEY: ${{ secrets.DEVIN_LEGACY_KEY }}
               GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
             run: |
               python .github/scripts/devin_issuer.py
