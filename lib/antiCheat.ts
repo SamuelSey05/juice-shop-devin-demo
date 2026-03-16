@@ -40,11 +40,8 @@ export const SENSITIVE_CHALLENGE_KEYS: string[] = [
   'leakedApiKeyChallenge'
 ]
 
-function sanitizeKeyForLog (key: string): string {
-  if (SENSITIVE_CHALLENGE_KEYS.includes(key)) {
-    return '[REDACTED]'
-  }
-  return key
+function isSensitiveChallenge (key: string): boolean {
+  return SENSITIVE_CHALLENGE_KEYS.includes(key)
 }
 
 const solves: Array<{ challenge: any, phase: string, timestamp: Date, cheatScore: number }> = [{ challenge: {}, phase: 'server start', timestamp: new Date(), cheatScore: 0 }] // seed with server start timestamp
@@ -98,9 +95,10 @@ export const calculateCheatScore = (challenge: Challenge) => {
     cheatScore = Math.min(1, cheatScore)
   }
 
-  const sanitizedKey = sanitizeKeyForLog(challenge.key)
   const hasTutorialOrder = Boolean(challenge.tutorialOrder)
-  logger.info(`Cheat score for ${coupled ? 'coupled ' : (trivial ? 'trivial ' : '')}${hasTutorialOrder ? 'tutorial ' : ''}${colors.cyan(sanitizedKey)} solved in ${Math.round(minutesSincePreviousSolve)}min (expected ~${minutesExpectedToSolve}min) with${config.get('challenges.showHints') ? '' : 'out'} hints allowed${percentPrecedingInteraction > -1 ? (' and ' + percentPrecedingInteraction * 100 + '% expected preceding URL interaction') : ''}: ${cheatScore < 0.33 ? colors.green(cheatScore.toString()) : (cheatScore < 0.66 ? colors.yellow(cheatScore.toString()) : colors.red(cheatScore.toString()))}`)
+  const sensitive = isSensitiveChallenge(challenge.key)
+  const logKey = sensitive ? colors.cyan('[REDACTED]') : colors.cyan(challenge.key)
+  logger.info(`Cheat score for ${coupled ? 'coupled ' : (trivial ? 'trivial ' : '')}${hasTutorialOrder ? 'tutorial ' : ''}${logKey} solved in ${Math.round(minutesSincePreviousSolve)}min (expected ~${minutesExpectedToSolve}min) with${config.get('challenges.showHints') ? '' : 'out'} hints allowed${percentPrecedingInteraction > -1 ? (' and ' + percentPrecedingInteraction * 100 + '% expected preceding URL interaction') : ''}: ${cheatScore < 0.33 ? colors.green(cheatScore.toString()) : (cheatScore < 0.66 ? colors.yellow(cheatScore.toString()) : colors.red(cheatScore.toString()))}`)
   solves.push({ challenge, phase: 'hack it', timestamp, cheatScore })
   return cheatScore
 }
@@ -125,9 +123,10 @@ export const calculateFindItCheatScore = async (challenge: Challenge) => {
   const minutesSincePreviousSolve = (timestamp.getTime() - previous().timestamp.getTime()) / 60000
   cheatScore += Math.max(0, 1 - (minutesSincePreviousSolve / minutesExpectedToSolve))
 
-  const sanitizedKey = sanitizeKeyForLog(challenge.key)
   const isTutorialScoreBoard = challenge.key === 'scoreBoardChallenge' && config.get('hackingInstructor.isEnabled')
-  logger.info(`Cheat score for "Find it" phase of ${isTutorialScoreBoard ? 'tutorial ' : ''}${colors.cyan(sanitizedKey)} solved in ${Math.round(minutesSincePreviousSolve)}min (expected ~${minutesExpectedToSolve}min): ${cheatScore < 0.33 ? colors.green(cheatScore.toString()) : (cheatScore < 0.66 ? colors.yellow(cheatScore.toString()) : colors.red(cheatScore.toString()))}`)
+  const sensitive = isSensitiveChallenge(challenge.key)
+  const logKey = sensitive ? colors.cyan('[REDACTED]') : colors.cyan(challenge.key)
+  logger.info(`Cheat score for "Find it" phase of ${isTutorialScoreBoard ? 'tutorial ' : ''}${logKey} solved in ${Math.round(minutesSincePreviousSolve)}min (expected ~${minutesExpectedToSolve}min): ${cheatScore < 0.33 ? colors.green(cheatScore.toString()) : (cheatScore < 0.66 ? colors.yellow(cheatScore.toString()) : colors.red(cheatScore.toString()))}`)
   solves.push({ challenge, phase: 'find it', timestamp, cheatScore })
 
   return cheatScore
@@ -142,8 +141,9 @@ export const calculateFixItCheatScore = async (challenge: Challenge) => {
   const minutesSincePreviousSolve = (timestamp.getTime() - previous().timestamp.getTime()) / 60000
   cheatScore += Math.max(0, 1 - (minutesSincePreviousSolve / minutesExpectedToSolve))
 
-  const sanitizedKey = sanitizeKeyForLog(challenge.key)
-  logger.info(`Cheat score for "Fix it" phase of ${colors.cyan(sanitizedKey)} solved in ${Math.round(minutesSincePreviousSolve)}min (expected ~${minutesExpectedToSolve}min): ${cheatScore < 0.33 ? colors.green(cheatScore.toString()) : (cheatScore < 0.66 ? colors.yellow(cheatScore.toString()) : colors.red(cheatScore.toString()))}`)
+  const sensitive = isSensitiveChallenge(challenge.key)
+  const logKey = sensitive ? colors.cyan('[REDACTED]') : colors.cyan(challenge.key)
+  logger.info(`Cheat score for "Fix it" phase of ${logKey} solved in ${Math.round(minutesSincePreviousSolve)}min (expected ~${minutesExpectedToSolve}min): ${cheatScore < 0.33 ? colors.green(cheatScore.toString()) : (cheatScore < 0.66 ? colors.yellow(cheatScore.toString()) : colors.red(cheatScore.toString()))}`)
   solves.push({ challenge, phase: 'fix it', timestamp, cheatScore })
   return cheatScore
 }
