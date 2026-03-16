@@ -79,7 +79,9 @@ export const calculateCheatScore = (challenge: Challenge) => {
   let timeFactor = 2
   timeFactor *= (config.get('challenges.showHints') ? 1 : 1.5)
   timeFactor *= (challenge.tutorialOrder && config.get('hackingInstructor.isEnabled') ? 0.5 : 1)
-  if (areCoupled(challenge, previous().challenge) || isTrivial(challenge)) {
+  const coupled = areCoupled(challenge, previous().challenge)
+  const trivial = isTrivial(challenge)
+  if (coupled || trivial) {
     timeFactor = 0
   }
 
@@ -97,7 +99,8 @@ export const calculateCheatScore = (challenge: Challenge) => {
   }
 
   const sanitizedKey = sanitizeKeyForLog(challenge.key)
-  logger.info(`Cheat score for ${areCoupled(challenge, previous().challenge) ? 'coupled ' : (isTrivial(challenge) ? 'trivial ' : '')}${challenge.tutorialOrder ? 'tutorial ' : ''}${colors.cyan(sanitizedKey)} solved in ${Math.round(minutesSincePreviousSolve)}min (expected ~${minutesExpectedToSolve}min) with${config.get('challenges.showHints') ? '' : 'out'} hints allowed${percentPrecedingInteraction > -1 ? (' and ' + percentPrecedingInteraction * 100 + '% expected preceding URL interaction') : ''}: ${cheatScore < 0.33 ? colors.green(cheatScore.toString()) : (cheatScore < 0.66 ? colors.yellow(cheatScore.toString()) : colors.red(cheatScore.toString()))}`)
+  const hasTutorialOrder = Boolean(challenge.tutorialOrder)
+  logger.info(`Cheat score for ${coupled ? 'coupled ' : (trivial ? 'trivial ' : '')}${hasTutorialOrder ? 'tutorial ' : ''}${colors.cyan(sanitizedKey)} solved in ${Math.round(minutesSincePreviousSolve)}min (expected ~${minutesExpectedToSolve}min) with${config.get('challenges.showHints') ? '' : 'out'} hints allowed${percentPrecedingInteraction > -1 ? (' and ' + percentPrecedingInteraction * 100 + '% expected preceding URL interaction') : ''}: ${cheatScore < 0.33 ? colors.green(cheatScore.toString()) : (cheatScore < 0.66 ? colors.yellow(cheatScore.toString()) : colors.red(cheatScore.toString()))}`)
   solves.push({ challenge, phase: 'hack it', timestamp, cheatScore })
   return cheatScore
 }
@@ -123,7 +126,8 @@ export const calculateFindItCheatScore = async (challenge: Challenge) => {
   cheatScore += Math.max(0, 1 - (minutesSincePreviousSolve / minutesExpectedToSolve))
 
   const sanitizedKey = sanitizeKeyForLog(challenge.key)
-  logger.info(`Cheat score for "Find it" phase of ${challenge.key === 'scoreBoardChallenge' && config.get('hackingInstructor.isEnabled') ? 'tutorial ' : ''}${colors.cyan(sanitizedKey)} solved in ${Math.round(minutesSincePreviousSolve)}min (expected ~${minutesExpectedToSolve}min): ${cheatScore < 0.33 ? colors.green(cheatScore.toString()) : (cheatScore < 0.66 ? colors.yellow(cheatScore.toString()) : colors.red(cheatScore.toString()))}`)
+  const isTutorialScoreBoard = challenge.key === 'scoreBoardChallenge' && config.get('hackingInstructor.isEnabled')
+  logger.info(`Cheat score for "Find it" phase of ${isTutorialScoreBoard ? 'tutorial ' : ''}${colors.cyan(sanitizedKey)} solved in ${Math.round(minutesSincePreviousSolve)}min (expected ~${minutesExpectedToSolve}min): ${cheatScore < 0.33 ? colors.green(cheatScore.toString()) : (cheatScore < 0.66 ? colors.yellow(cheatScore.toString()) : colors.red(cheatScore.toString()))}`)
   solves.push({ challenge, phase: 'find it', timestamp, cheatScore })
 
   return cheatScore
