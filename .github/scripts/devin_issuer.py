@@ -18,7 +18,9 @@ def main():
     with open(sarif_path, "r") as f:
         data = json.load(f)
 
-    results = data["runs"][0]["results"]
+    results = [data["runs"][0]["results"]]
+
+    results = [result for result in results if result["ruleId"] == "js/server-crash"]
 
     print(f"Total issues found: {len(results)}")
 
