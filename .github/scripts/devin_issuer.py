@@ -20,13 +20,11 @@ def main():
 
     results = [data["runs"][0]["results"]]
 
-    print(results)
+    print(f"Total issues found: {len(results)}")
 
-    scs = [result for result in results if result["ruleId"] == "js/server-crash"]
-
-    print(f"Total issues found: {len(scs)}")
-
-    for error in scs[0:1]:
+    for error in results:
+        if error["ruleId"] != "js/server-crash":
+            continue
         rule_id = error["ruleId"]
         message = error["message"]["text"]
         
