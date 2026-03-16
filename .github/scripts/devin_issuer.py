@@ -43,7 +43,7 @@ def main():
         response = requests.post(url, headers=headers, json=payload)    
 
         if response.status_code in [200, 201]:
-            print(f"Successfully created session for {rule_id} at {location}:{line}")
+            print(f"Successfully created session for {rule_id} at {location}:{line}. Returned: {response.text}")
         else:            
             print(f"Failed to create session for {rule_id} at {location}:{line}. Status code: {response.status_code}, Response: {response.text}")    
 
