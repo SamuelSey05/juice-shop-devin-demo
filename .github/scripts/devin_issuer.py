@@ -36,8 +36,6 @@ def main():
 
         payload = {"prompt": prompt, "idempotency_key": f"{rule_id}_{location}_{line}"}
 
-        # url = "https://api.devin.ai/v3/organisations/org-7aaaba4d64474a1a931e3aa3323b5ce8/sessions"
-
         url = "https://api.devin.ai/v1/sessions"
 
         response = requests.post(url, headers=headers, json=payload)    
