@@ -18,13 +18,16 @@ def main():
     with open(sarif_path, "r") as f:
         data = json.load(f)
 
-    results = [data["runs"][0]["results"]]
+    results = data["runs"][0]["results"]
 
-    print(f"Total issues found: {len(results)}")
+    print(results)
 
-    for error in results:
-        if error["ruleId"] != "js/server-crash":
-            continue
+    scs = [result for result in results if result["ruleId"] == "js/server-crash"]
+
+    print(f"Total issues found: {len(scs)}")
+
+    for error in scs[0:1]:
+        
         rule_id = error["ruleId"]
         message = error["message"]["text"]
         
