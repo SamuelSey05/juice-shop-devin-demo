@@ -16,26 +16,23 @@ import * as utils from './utils'
 import median from 'median'
 import { type ChallengeKey } from 'models/challenge'
 
-const sensitiveChallengKeys: readonly string[] = [
-  'changePasswordBenderChallenge',
-  'weakPasswordChallenge',
-  'dlpPasswordSprayingChallenge',
-  'oauthUserPasswordChallenge',
-  'resetPasswordJimChallenge',
-  'resetPasswordBenderChallenge',
-  'resetPasswordBjoernChallenge',
-  'resetPasswordMortyChallenge',
-  'resetPasswordBjoernOwaspChallenge',
-  'resetPasswordUvoginChallenge',
-  'passwordRepeatChallenge',
-  'leakedApiKeyChallenge'
-]
+const sensitiveKeyRedactions: Record<string, string> = {
+  changePasswordBenderChallenge: 'cha***',
+  weakPasswordChallenge: 'wea***',
+  dlpPasswordSprayingChallenge: 'dlp***',
+  oauthUserPasswordChallenge: 'oau***',
+  resetPasswordJimChallenge: 'res***',
+  resetPasswordBenderChallenge: 'res***',
+  resetPasswordBjoernChallenge: 'res***',
+  resetPasswordMortyChallenge: 'res***',
+  resetPasswordBjoernOwaspChallenge: 'res***',
+  resetPasswordUvoginChallenge: 'res***',
+  passwordRepeatChallenge: 'pas***',
+  leakedApiKeyChallenge: 'lea***'
+}
 
 export const sanitizeKeyForLog = (key: string): string => {
-  if (sensitiveChallengKeys.includes(key)) {
-    return key.substring(0, 3) + '***'
-  }
-  return key
+  return sensitiveKeyRedactions[key] ?? key
 }
 
 const coupledChallenges = { // TODO prevent also near-identical challenges (e.g. all null byte file access or dom xss + bonus payload etc.) from counting as cheating
