@@ -12,7 +12,9 @@ def main():
         data = json.load(f)
 
     results = data["runs"][0]["results"]
-    high_priority = [r for r in results if r.get("level") in ["error", "warning"]]
+    high_priority = [r for r in results if r["level"] in ["error", "warning"]]
+
+    print(len(high_priority), "high priority issues found. Processing the top 2...")
 
     for error in high_priority[0:2]:
         print(error)
